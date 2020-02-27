@@ -13,6 +13,14 @@ war {
 	archiveName 'learn-german.war'
 }
 
+jar {
+    manifest {
+        attributes(
+                'Main-Class': 'home.Main'
+        )
+    }
+}
+
 dependencies {
 	compile group: 'org.springframework.boot', name: 'spring-boot', version: '2.1.8.RELEASE'
 	compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.1.8.RELEASE'
