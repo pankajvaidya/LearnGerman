@@ -20,7 +20,8 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.6</version>
         <configuration>
           <archive>
             <manifest>
@@ -28,6 +29,7 @@
               <mainClass>home.Main</mainClass>
             </manifest>
           </archive>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
       </plugin>
     </plugins>
