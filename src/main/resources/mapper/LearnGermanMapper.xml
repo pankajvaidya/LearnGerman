@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="home.LearnGermanMapper">
+
+    <select id="getLanguageComponentList" resultType="home.LanguageComponentVO" useCache="false">
+        select language_component_id, language_component_name from language_component order by sequence_no
+    </select>
+    
+        <select id="getLanguageComponent" resultType="home.LanguageComponentVO" useCache="false">
+        select language_component_id, language_component_name from language_component where language_component_id = #{language_component_id}
+    </select>
+
+    <select id="getWordList" resultType="String" parameterType="map" useCache="false">
+        select word_name from word where language_component_id = #{language_component_id}
+    </select>
+    
+</mapper>

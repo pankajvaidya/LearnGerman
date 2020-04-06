@@ -1,19 +1,15 @@
 package home;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.ModelAndView;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,57 +22,77 @@ public class HomeController {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
+	
+	@Inject
+	LearnGermanDAO learnGermanDao;
 
 	@RequestMapping("/")
 		public String index() {
 			return "index";
 	}
 	   
-    @RequestMapping("/select")
+    @RequestMapping("/selectLanguageComponent")
     public String home(ModelMap modelMap) {
-    	List<Map<String,Object>> languageComponentList = jdbcTemplate.queryForList
-    			("select language_component_id, language_component_name from language_component order by sequence_no");
+    	List<LanguageComponentVO> languageComponentList = learnGermanDao.getLanguageComponentList();
     	modelMap.addAttribute("languageComponentList", languageComponentList);
-        return "select";
+        return "selectLanguageComponent";
     }
 
     @RequestMapping("/blankOutLangageComponent")
     public String blankOutLangageComponent(@RequestParam("languageText") String languageText,
-    		@RequestParam("languageComponent") String languageComponent, ModelMap modelMap) {
+    		@RequestParam("languageComponent") String languageComponent, 
+    		ModelMap modelMap) {
     	System.out.println("languageComponent :" + languageComponent);
     	System.out.println("languageText :" + languageText);
-    	languageText = StringEscapeUtils.escapeHtml4(languageText);
+    	
+    	//languageText = StringEscapeUtils.escapeHtml4(languageText);
 
     	modelMap.addAttribute("languageComponent", languageComponent);
     	modelMap.addAttribute("languageText", languageText);
     	
-    	String query = " select word_name from word where language_component_id = " + languageComponent ;
-    
-    	List<String> languageBrick = jdbcTemplate.queryForList(query, String.class);
+    	Map<String,Object> params = new HashMap<String,Object>();
+    	params.put("language_component_id", languageComponent);
+    	List<String> languageBrick = learnGermanDao.getWordList(params);
+    	
     	String modifiedLanguageText = splitLanguageBricks(languageText,languageBrick);
     	modelMap.addAttribute("modifiedLanguageText", modifiedLanguageText);
 
     	System.out.println(languageBrick);
     	System.out.println("Size is : " + languageBrick.size());
     	System.out.println("done");
-        return "evaluate";
+    	
+    	if (languageText.equals(modifiedLanguageText)) {
+        	Map<String,Object> paramsLanguageComponent = new HashMap<String,Object>();
+        	paramsLanguageComponent.put("language_component_id", languageComponent);
+        	LanguageComponentVO languageComponentVO = learnGermanDao.getLanguageComponent(paramsLanguageComponent);
+        	modelMap.addAttribute("languageComponent", languageComponentVO);
+    		return "languageComponentNotFound" ;
+    	}
+        return "blankOutLangageComponent";
     }    
 
     @RequestMapping("/evaluateLangageComponent")
-    public String evaluateLangageComponent(@RequestParam("languageText") String languageText,
+    public String evaluateLangageComponent(
+    		@RequestParam("languageText") String languageText,
     		@RequestParam("modifiedLanguageText") String modifiedLanguageText,
     		@RequestParam("languageComponent") String languageComponent,
     		@RequestParam("languageBrick") List<String> languageBricks,
     		ModelMap modelMap) {
     	
-    	System.out.println("modifiedLanguageText :" + modifiedLanguageText);
+    	// If languageBricks array has size zero, create an empty element.
+    	if (languageBricks.size() == 0) {
+    		languageBricks.add("");
+    	}
     	System.out.println("languageText :" + languageText);
+    	System.out.println("modifiedLanguageText :" + modifiedLanguageText);
+    	System.out.println("languageComponent :" + languageComponent);
     	System.out.println("languageBrick :" + languageBricks);
     	System.out.println("languageBrick :" + languageBricks.size());
     	
-    	String query = " select word_name from word where language_component_id = " + languageComponent ;
+    	Map<String,Object> params = new HashMap<String,Object>();
+    	params.put("language_component_id", languageComponent);
+    	List<String> languageBricksFromDb = learnGermanDao.getWordList(params);
     	
-    	List<String> languageBricksFromDb = jdbcTemplate.queryForList(query, String.class);
     	String patternString = "\\b(" + StringUtils.join(languageBricksFromDb, "|") + ")\\b";
     	System.out.println("Pattern String is " + patternString);
     	String evaluationResultString  = "" ;
@@ -104,7 +120,6 @@ public class HomeController {
             	} else {
             		evaluationResultString += "<b><font color=red>" + valueToCompare + "</font></b>" ;
             	}
-            	
             }
         }
         evaluationResultString += languageText.substring(endIndexToTrack);
@@ -124,6 +139,4 @@ public class HomeController {
 		}
 		return passage;
     }
-    
-
 }

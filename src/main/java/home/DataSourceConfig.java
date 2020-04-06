@@ -16,7 +16,7 @@ public class DataSourceConfig {
 	 @Autowired
 	 Environment environment;	
 	     
-	    @Bean
+	    @Bean(name= "learnGermanDataSource")
 	    public DataSource getDataSource() {
 	        DataSourceBuilder dataSourceBuilder = DataSourceBuilder.create();
 	        dataSourceBuilder.driverClassName(environment.getProperty("spring.datasource.driver.class.name"));

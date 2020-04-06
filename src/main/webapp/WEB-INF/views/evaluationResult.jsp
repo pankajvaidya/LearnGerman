@@ -25,7 +25,7 @@
 		</tr>
 	</table>
 	<hr>
-	<a href="select">enter new German language data set</a>
+	<a href="selectLanguageComponent">enter new German language data set</a>
 	<br><br>
 	<a href="/">Home Page</a>
 </body>

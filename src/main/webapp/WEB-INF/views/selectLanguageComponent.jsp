@@ -3,20 +3,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="ISO-8859-1">
+<meta charset="UTF-8">
 </head>
 
 <h2>Enter German Language Data set</h2>
     
 <form method="post" action="blankOutLangageComponent"> 
-    Enter Text : <br> <textarea name="languageText" rows="10" cols="70" required></textarea>
+    Enter Text : <br> <textarea name="languageText" rows="10" cols="80" maxlength="700" required></textarea>
     <br>
     Select Option to test: 
     <select type="text" name="languageComponent"/>
-    	<c:forEach items="${languageComponentList}" var="map">
-        	<option value="${map.language_component_id}">${map.language_component_name}</option>
+    	<c:forEach items="${languageComponentList}" var="languageComponent">
+        	<option value="${languageComponent.language_component_id}">${languageComponent.language_component_name}</option>
     	</c:forEach>
     </select>
+    <br>
 <input type="submit" value="Submit">
 </form>
 

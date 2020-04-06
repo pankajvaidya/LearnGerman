@@ -10,7 +10,7 @@
 <h2>Home Page</h2>
 
        
-	<a href="select">Enter German language data set</a>
+	<a href="selectLanguageComponent">Enter German language data set</a>
     
 
 
